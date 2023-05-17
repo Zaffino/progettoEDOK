@@ -1,8 +1,13 @@
 package com.unitn.zaffino.lingProg.grafico;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.LinkedList;
+
 public class Prodotto {
 
-    private static int PRODOTTO_COUNT = 0;
+
 
     private String nome;
     private int id;
@@ -11,11 +16,17 @@ public class Prodotto {
 
     public Prodotto(String nome, Fornitore fornitore, int prezzo) {
         this.nome = nome;
-        id = PRODOTTO_COUNT+1;
         this.fornitore = fornitore;
         this.prezzo = prezzo;
-        PRODOTTO_COUNT++;
     }
+
+    public Prodotto(String nome, int id, Fornitore fornitore, int prezzo) {
+        this.nome = nome;
+        this.id = id;
+        this.fornitore = fornitore;
+        this.prezzo = prezzo;
+    }
+
 
     public String getNome() {
         return nome;
@@ -60,4 +71,7 @@ public class Prodotto {
                 "\tfornitore - " + fornitore +
                 "\tprezzo - " + prezzo;
     }
+
+
+
 }

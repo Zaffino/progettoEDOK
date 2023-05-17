@@ -13,8 +13,8 @@ public class Ordine {
     private int prezzoTotale;
 
     /*
-    * crea un nuovo ordine vuoto
-    * */
+     * crea un nuovo ordine vuoto
+     * */
     public Ordine() {
         id = ORDINE_COUNT+1;
         listaProdotti = new LinkedList<>();

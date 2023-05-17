@@ -1,47 +1,55 @@
 package com.unitn.zaffino.lingProg.grafico;
 
 import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.*;
 import java.util.LinkedList;
-import java.util.Scanner;
 
 
 /*
-* La classe deve gestire la sessione in corso
-* quando viene creato un oggetto Console viene chiamata la classe privata mainMenu
-* che a sua volta chiama altri menu in base agli input dell'utente
-* */
+ * La classe deve gestire la sessione in corso
+ * quando viene creato un oggetto Console viene chiamata la classe privata mainMenu
+ * che a sua volta chiama altri menu in base agli input dell'utente
+ * */
 public class Console {
 
     LinkedList<Prodotto> prodotti;
     LinkedList<Fornitore> fornitori;
     Ordine ordine;
+    Connection connection;
+    DBdaoFornitori dBdaoFornitori;
+    DBdaoProdotti dBdaoProdotti;
 
 
     /*
-    * copia i prodotti e i fornitori inizializzati in precedenza e apre il main menu
-    * */
-    public Console(LinkedList<Prodotto> prodottiSessione, LinkedList<Fornitore> fornitoriSessione){
+     * copia i prodotti e i fornitori inizializzati in precedenza e apre il main menu
+     * */
+    public Console(Connection connection){
         prodotti = new LinkedList<>();
         fornitori = new LinkedList<>();
+        this.connection = connection;
 
-        prodotti.addAll(prodottiSessione);
-        fornitori.addAll(fornitoriSessione);
+        this.dBdaoFornitori = new DBdaoFornitori(connection);
+        this.dBdaoProdotti = new DBdaoProdotti(connection);
+
+
+        fornitori.addAll(dBdaoFornitori.selectAll());
+        prodotti.addAll(dBdaoProdotti.selectAll());
+
 
         mainMenu();
     }
 
-
     /*
-    * permette la creazione un nuovo ordine
-    * o di uscire dall'applicazione
-    * */
+     * permette la creazione un nuovo ordine
+     * o di uscire dall'applicazione
+     * */
     private void mainMenu() {
         System.out.println("Quale operazione desideri compiere?");
-        System.out.println("1. Crea nuovo ordine\n" +
-                "2. Chiudi");
+        System.out.println("1. Crea nuovo ordine\n" + "2. Registra nuovo fornitore\n" +
+                "3. Registra nuovo prodotto\n" + "4. Rimuovi fornitore\n" +
+                "5. Rimuovi prodotto\n" + "6. Stampa fornitori\n" +
+                "7. Stampa prodotti\n" + "100. Chiudi");
 
         int s;
         BufferedReader reader = new BufferedReader(
@@ -63,7 +71,47 @@ public class Console {
                 mainMenu();
                 break;
 
-            case 2:
+            case 2: //non ha bisogno di download
+                registraNuovoFornitore();
+                fornitori.clear();
+                fornitori.addAll(dBdaoFornitori.selectAll());
+                mainMenu();
+                break;
+
+            case 3: //fa da solo il download
+                registraNuovoProdotto();
+                prodotti.clear();
+                prodotti.addAll(dBdaoProdotti.selectAll());
+                mainMenu();
+                break;
+
+            case 4:
+                rimuoviFornitore();
+                mainMenu();
+                break;
+
+            case 5:
+                rimuoviProdotto();
+                mainMenu();
+                break;
+
+            case 6:
+                for (Fornitore f: dBdaoFornitori.selectAll()
+                ) {
+                    System.out.println(f.toString());
+                }
+                mainMenu();
+                break;
+
+            case 7:
+                for (Prodotto p: dBdaoProdotti.selectAll()
+                ) {
+                    System.out.println(p.toString());
+                }
+                mainMenu();
+                break;
+
+            case 100:
                 break;
 
             default:
@@ -78,9 +126,9 @@ public class Console {
     private void ordineMenu(){
         System.out.println("Quale operazione desideri compiere?");
         System.out.println("1. Aggiungi nuovi elementi\n" +
-                        "2. Elimina elementi\n" +
-                        "3. Completa ordine\n" +
-                        "4. Annulla ordine");
+                "2. Elimina elementi\n" +
+                "3. Completa ordine\n" +
+                "4. Annulla ordine");
 
         int s;
         BufferedReader reader = new BufferedReader(
@@ -129,63 +177,6 @@ public class Console {
     }
 
 
-    /*
-    * obsoleto:
-    * il metodo richiede l'inserimento di 2 valori.
-    * il primo è l'id del prodotto
-    * il secondo è la quantità del prodotto
-    * */
-    private void aggiungiElementoMenu(){
-
-        System.out.println("quale elemento vuoi aggiungere?");
-        for (Prodotto p: prodotti) {
-            System.out.println(p.simplifiedToString());
-        }
-
-        int s;
-
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(System.in));
-        try {
-            String input = reader.readLine();
-            s = Integer.parseInt(input);
-        }
-        catch (Exception e){
-            s = -1;
-        }
-
-        if (s == -1){
-            System.err.println("PRODOTTO INESISTENTE");
-            return; //c'è un errore e mi torna indietro
-        }
-        else{
-            for (Prodotto p: prodotti) {
-                if (p.getId() == s) ordine.getListaProdotti().add(p);
-            } //edit this
-        }
-
-        System.out.println("in che quantità?");
-
-        int s2;
-        reader = new BufferedReader(new InputStreamReader(System.in));
-        try {
-            String input = reader.readLine();
-            s2 = Integer.parseInt(input);
-        }
-        catch (Exception e){
-            s2 = -1;
-        }
-        if (s2 <= 0) return;
-        else{
-            ordine.getQuantitaProdotti().add(s2);
-
-            int prezzoDaAggiungere = ordine.getListaProdotti().getLast().getPrezzo() * s2; //calcolo funzionante
-
-            ordine.addPrezzoTotale(prezzoDaAggiungere);
-        }
-
-    }
-
 
     /*
      * il metodo richiede l'inserimento di 2 valori.
@@ -203,8 +194,6 @@ public class Console {
         }
 
 
-
-
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         try {
             String input = reader.readLine();
@@ -213,12 +202,21 @@ public class Console {
         catch (Exception e){
             theID = -1;
             System.err.println("NON E' UN NUMERO");
+            return;
+        }
+
+        boolean nonEsiste = true;
+        for (Prodotto p: prodotti) {
+            if (p.getId() == theID) nonEsiste = false;
+        }
+        if (nonEsiste){
+            System.err.println("PRODOTTO INESISTENTE");
+            return;
         }
 
         System.out.println("in che quantita?");
 
-        reader = new BufferedReader(
-                new InputStreamReader(System.in));
+
         try {
             String input = reader.readLine();
             q = Integer.parseInt(input);
@@ -246,10 +244,9 @@ public class Console {
 
 
     /*
-    * il metodo richiede l'inserimento di 1 valore.
-    * il valore è l'id del prodotto
-    *
-    * */
+     * il metodo richiede l'inserimento di 1 valore.
+     * il valore è l'id del prodotto
+     * */
     private void rimuoviElementoMenu(){
         System.out.println("cosa desideri rimuovere?");
         ordine.printListaProdotti();
@@ -274,4 +271,98 @@ public class Console {
                 System.err.println("PRODOTTO INESISTENTE");
     }
 
+    /*
+     * Menu per registrare un nuovo fornitore, richiede un nome in input
+     */
+    private void registraNuovoFornitore(){
+        System.out.println("inserisci il nome");
+
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(System.in));
+        try {
+            String input = reader.readLine();
+            Fornitore f = new Fornitore(input);
+            dBdaoFornitori.insert(f);
+            //f.uploadToDB(connection);
+        }
+        catch (Exception e){
+            System.err.println("ERRORE INSERIMENTO NOME");
+        }
+    }
+
+    /*
+     * Menu per aggiungere un nuovo prodotto, richiede l'id del fornitore, il nome del prodotto e il prezzo
+     */
+    private boolean registraNuovoProdotto(){
+
+        int id_forn, prezzo;
+        String nome;
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(System.in));
+        try {
+            System.out.println("inserisci l'id fornitore");
+            String input = reader.readLine();
+            id_forn = Integer.parseInt(input);
+
+            System.out.println("inserisci il nome del prodotto");
+            nome = reader.readLine();
+
+            System.out.println("inserisci il prezzo del prodotto");
+            input = reader.readLine();
+            prezzo = Integer.parseInt(input);
+        }
+        catch (Exception e){
+            System.err.println("ERRORE INSERIMENTO VALORI");
+            return false;
+        }
+
+
+
+        LinkedList<Fornitore> f = dBdaoFornitori.selectByID(id_forn);
+        if (f.isEmpty()){
+            System.err.println("FORNITORE INESISTENTE");
+            return false;
+        }
+
+
+        Fornitore fornitore = f.getFirst(); //esiste solo un fornitore per id
+
+        //loadtodb
+        Prodotto p = new Prodotto(nome,fornitore,prezzo);
+        dBdaoProdotti.insert(p);
+
+
+
+        return true;
+    }
+
+    private void rimuoviProdotto(){
+
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(System.in));
+        try {
+            System.out.println("inserisci l'id del prodotto");
+            String input = reader.readLine();
+            dBdaoProdotti.remove(Integer.parseInt(input));
+        }
+        catch (Exception e){
+            System.err.println("ERRORE INSERIMENTO VALORE");
+        }
+    }
+
+    private void rimuoviFornitore(){
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(System.in));
+        try {
+            System.out.println("inserisci l'id del fornitore");
+            String input = reader.readLine();
+            dBdaoFornitori.remove(Integer.parseInt(input));
+        }
+        catch (Exception e){
+            System.err.println("ERRORE INSERIMENTO VALORE");
+        }
+    }
+
 }
+
+

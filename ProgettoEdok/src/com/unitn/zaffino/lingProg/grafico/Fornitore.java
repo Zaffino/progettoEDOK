@@ -1,30 +1,31 @@
 package com.unitn.zaffino.lingProg.grafico;
 
+import java.sql.*;
+import java.util.LinkedList;
+
 public class Fornitore {
 
-    private static int FORNITORE_COUNT = 0;
+
 
     private String nome;
     private int id;
 
     public Fornitore(String nome) {
         this.nome = nome;
-        id = FORNITORE_COUNT+1;
-        FORNITORE_COUNT++;
+    }
+
+    public Fornitore(int forn_id ,String nome){
+        this.nome = nome;
+        this.id = forn_id;
     }
 
     public String getNome() {
         return nome;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
     public int getId() {
         return id;
     }
-
 
     @Override
     public String toString() {
@@ -32,4 +33,6 @@ public class Fornitore {
                 "\tnome - " + nome +
                 "\tid - " + id;
     }
+
+
 }
