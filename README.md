@@ -31,3 +31,14 @@ CREATE TABLE IF NOT EXISTS prodotto
 ## DRIVER JDBC
 
 Per far funzionare l'applicazione è necessario installare e aggiungere la <a href ="https://jdbc.postgresql.org/download/postgresql-42.6.0.jar">libreria esterna</a>
+
+
+## CHIARIMENTI DURANTE L'ESECUZIONE DELL'APPLICAZIONE
+
+Viene richiesto l'inserimento dell'url del database, l'username e la password, per essere più chiari questo è un esempio di url:
+jdbc:postgresql://localhost:5432/myDB
+
+Quando inserisci un nuovo prodotto e fornitore, non è necessario l'inserimento dell'id siccome viene assegnato dal database.
+Per inserire un nuovo prodotto è comunque necessario inserire l'id di un fornitore esistente, altrimenti non viene inserito nulla.
+
+Siccome il sistema non è stato pensato per essere utilizzato in un caso reale, non sono presenti sistemi di sicurezza come le password.
