@@ -75,7 +75,7 @@ public class DBdaoFornitori implements DBdao<Fornitore>{
         ResultSet res;
         try {
             stmt = c.createStatement();
-            String sql = "SELECT FROM fornitore where id_fornitore = " + id +";";
+            String sql = "SELECT * FROM fornitore where id_fornitore = " + id +";";
             res = stmt.executeQuery(sql);
             while (res.next()){
                 int itsId = res.getInt("id_fornitore");
