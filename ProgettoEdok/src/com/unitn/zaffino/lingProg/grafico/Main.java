@@ -7,7 +7,9 @@ import java.util.LinkedList;
 
 public class Main {
 
-
+    /*
+    * Si connette con un database postgres
+    * */
     public static Connection connectToDB(String url, String user, String password){
         Connection c = null;
         try {
@@ -54,5 +56,5 @@ public class Main {
 
 /*
  * TODO:
- *  
+ *
  * */

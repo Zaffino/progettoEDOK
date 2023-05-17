@@ -22,7 +22,7 @@ public class Console {
 
 
     /*
-     * copia i prodotti e i fornitori inizializzati in precedenza e apre il main menu
+     * copia i prodotti e i fornitori dal database e apre il main menu
      * */
     public Console(Connection connection){
         prodotti = new LinkedList<>();
@@ -41,8 +41,7 @@ public class Console {
     }
 
     /*
-     * permette la creazione un nuovo ordine
-     * o di uscire dall'applicazione
+     * permette la selezione dell'operazione
      * */
     private void mainMenu() {
         System.out.println("Quale operazione desideri compiere?");
@@ -291,7 +290,8 @@ public class Console {
     }
 
     /*
-     * Menu per aggiungere un nuovo prodotto, richiede l'id del fornitore, il nome del prodotto e il prezzo
+     * Menu per aggiungere un nuovo prodotto, richiede l'id del fornitore, il nome del prodotto e il prezzo.
+     * Se l'id non esiste, non registra il prodotto
      */
     private boolean registraNuovoProdotto(){
 
@@ -336,6 +336,9 @@ public class Console {
         return true;
     }
 
+    /*
+    * dato un id, rimuove un prodotto
+    * */
     private void rimuoviProdotto(){
 
         BufferedReader reader = new BufferedReader(
@@ -350,6 +353,10 @@ public class Console {
         }
     }
 
+    /*
+     * dato un id, rimuove un rifornitore,
+     * i prodotti collegati al fornitore vengono rimossi a cascata come definito dal database
+     * */
     private void rimuoviFornitore(){
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(System.in));
